@@ -1,11 +1,12 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from .run_config import RunConfig
-from .api_config import APIConfig
-from .database_config import DatabaseConfig
+
 from .api_auth_config import AuthConfig
-from .uploads_config import UploadsConfig
-from .invitations_config import InvitationsConfig
+from .api_config import APIConfig
 from .cors_config import CORSConfig
+from .database_config import DatabaseConfig
+from .invitations_config import InvitationsConfig
+from .run_config import RunConfig
+from .uploads_config import UploadsConfig
 
 
 class Settings(BaseSettings):
