@@ -24,5 +24,14 @@ class Settings(BaseSettings):
     invitations: InvitationsConfig = InvitationsConfig()
     cors: CORSConfig
 
+    @property
+    def sync_database_url(self) -> str:
+        return str(
+            self.db.pg.url
+            ).replace(
+            "postgresql+asyncpg://",
+            "postgresql+psycopg2://"
+        )
+
 
 settings = Settings()
