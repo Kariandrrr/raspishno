@@ -6,3 +6,4 @@ class RoomType(enum.Enum):
     laboratory = "laboratory"
     computer_class = "computer_class"
     common_class = "common_class"
+    gym = "gym"
