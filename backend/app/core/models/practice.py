@@ -33,7 +33,7 @@ class Practice(Base, UUIDPKMixin):
 
     __table_args__ = (
         CheckConstraint(
-            "practice_start_time < practice_end_time", name="ck_practice_time_order"
+            "practice_start_date < practice_end_date", name="ck_practice_date_order"
         ),
         CheckConstraint("hours > 0 AND hours <= 1000", name="ck_practice_hours_range"),
     )
