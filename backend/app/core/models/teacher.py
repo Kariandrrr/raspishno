@@ -14,7 +14,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .helpers import Base
-from .mixins import UUIDPKMixin
+from .mixins import UUIDPKMixin, TimestampMixin
 from ...enums import DayOfWeek
 
 
@@ -62,4 +62,30 @@ class TeacherAvailability(Base, UUIDPKMixin):
     # TODO: rel
 
 
-# TODO: teacher substitution
+class TeacherSubstitution(Base, UUIDPKMixin, TimestampMixin):
+    schedule_item_id: Mapped[UUID] = mapped_column(
+        ForeignKey("schedule_items.id", ondelete="RESTRICT"),
+        nullable=False, unique=True,
+    )
+    old_teacher_id: Mapped[UUID] = mapped_column(
+        ForeignKey("teachers.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    new_teacher_id: Mapped[UUID] = mapped_column(
+        ForeignKey("teachers.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    reason: Mapped[str] = mapped_column(String(100), nullable=True)
+
+    __table_args__ = (
+        CheckConstraint(
+            "old_teacher_id != new_teacher_id",
+            name="ck_teacher_substitution_diff_teachers",
+        ),
+        CheckConstraint(
+            "reason IS NULL OR length(trim(reason)) > 0",
+            name="ck_teacher_substitution_reason_not_empty",
+        ),
+    )
+    # TODO: rel
