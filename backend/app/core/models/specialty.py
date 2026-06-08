@@ -9,6 +9,8 @@ from .mixins import UUIDPKMixin
 
 
 class Specialty(Base, UUIDPKMixin):
+    __tablename__ = "specialties"
+
     name: Mapped[str] = mapped_column(String(40), nullable=False)
     code: Mapped[str] = mapped_column(String(15), nullable=False)
 
