@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
@@ -8,11 +9,15 @@ from sqlalchemy import (
     CheckConstraint,
 )
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from . import Speciality
 from .helpers import Base
 from .mixins import UUIDPKMixin
 from ...enums import Shift
+
+if TYPE_CHECKING:
+    from . import ScheduleItem
 
 
 class Group(Base, UUIDPKMixin):
@@ -28,6 +33,19 @@ class Group(Base, UUIDPKMixin):
     )
     student_count: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    # rel
+    speciality: Mapped["Speciality"] = relationship(
+        "Speciality",
+        back_populates="groups",
+        lazy="selectin",
+    )
+
+    schedule_items: Mapped[list["ScheduleItem"]] = relationship(
+        "ScheduleItem",
+        back_populates="group",
+        lazy="selectin",
+    )
+
     __table_args__ = (
         CheckConstraint(
             "student_count BETWEEN 1 AND 35",
@@ -38,4 +56,3 @@ class Group(Base, UUIDPKMixin):
             "speciality_id", "name", "year", name="uq_group_speciality_name_year"
         ),
     )
-    # TODO: rel

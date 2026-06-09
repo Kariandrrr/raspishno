@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import (
     Integer,
     UniqueConstraint,
@@ -7,11 +9,21 @@ from sqlalchemy import (
     Date,
 )
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
 from .mixins import UUIDPKMixin, TimestampMixin
 from ...enums import ActivityType
+
+if TYPE_CHECKING:
+    from . import Speciality
+    from . import Subject
+    from . import Semester
+    from . import Group
+    from . import Teacher
+    from . import Room
+    from . import TimeSlot
+    from . import TeacherSubstitution
 
 
 class SchedulePlan(Base, UUIDPKMixin):
@@ -41,6 +53,19 @@ class SchedulePlan(Base, UUIDPKMixin):
     lecture_hours: Mapped[int] = mapped_column(Integer, nullable=False)
     practice_hours: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    # rel
+    speciality: Mapped["Speciality"] = relationship(
+        "Speciality", back_populates="schedule_plans", lazy="selectin"
+    )
+
+    subject: Mapped["Subject"] = relationship(
+        "Subject", back_populates="schedule_plans", lazy="selectin"
+    )
+
+    semester: Mapped["Semester"] = relationship(
+        "Semester", back_populates="schedule_plans", lazy="selectin"
+    )
+
     __table_args__ = (
         CheckConstraint("year BETWEEN 1 AND 7", name="ck_schedule_plan_year_range"),
         CheckConstraint(
@@ -62,8 +87,6 @@ class SchedulePlan(Base, UUIDPKMixin):
             name="uq_schedule_plan_speciality_subject_semester",
         ),
     )
-
-    # TODO: rel
 
 
 class ScheduleItem(Base, UUIDPKMixin, TimestampMixin):
@@ -99,6 +122,38 @@ class ScheduleItem(Base, UUIDPKMixin, TimestampMixin):
         nullable=False,
     )
 
+    # rel
+    group: Mapped["Group"] = relationship(
+        "Group", back_populates="schedule_items", lazy="selectin"
+    )
+
+    subject: Mapped["Subject"] = relationship(
+        "Subject", back_populates="schedule_items", lazy="selectin"
+    )
+
+    teacher: Mapped["Teacher"] = relationship(
+        "Teacher", back_populates="schedule_items", lazy="selectin"
+    )
+
+    room: Mapped["Room"] = relationship(
+        "Room", back_populates="schedule_items", lazy="selectin"
+    )
+
+    semester: Mapped["Semester"] = relationship(
+        "Semester", back_populates="schedule_items", lazy="selectin"
+    )
+
+    time_slot: Mapped["TimeSlot"] = relationship(
+        "TimeSlot", back_populates="schedule_items", lazy="selectin"
+    )
+
+    substitution: Mapped["TeacherSubstitution | None"] = relationship(
+        "TeacherSubstitution",
+        back_populates="schedule_item",
+        uselist=False,
+        lazy="selectin",
+    )
+
     __table_args__ = (
         UniqueConstraint(
             "group_id", "class_date", "time_slot_id", name="uq_schedule_group_date_time"
@@ -113,4 +168,3 @@ class ScheduleItem(Base, UUIDPKMixin, TimestampMixin):
             "room_id", "class_date", "time_slot_id", name="uq_schedule_room_date_time"
         ),
     )
-    # TODO: rel

@@ -1,4 +1,5 @@
 from datetime import time, date
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
@@ -11,11 +12,16 @@ from sqlalchemy import (
     Boolean,
 )
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
 from .mixins import UUIDPKMixin, TimestampMixin
 from ...enums import DayOfWeek
+
+if TYPE_CHECKING:
+    from . import TeacherSubject
+    from . import ScheduleItem
+    from . import Subject
 
 
 class Teacher(Base, UUIDPKMixin):
@@ -31,13 +37,50 @@ class Teacher(Base, UUIDPKMixin):
 
     hired_date: Mapped[date] = mapped_column(Date, nullable=False)
 
+    # rel
+    teacher_subjects: Mapped[list["TeacherSubject"]] = relationship(
+        "TeacherSubject",
+        back_populates="teacher",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    availabilities: Mapped[list["TeacherAvailability"]] = relationship(
+        "TeacherAvailability",
+        back_populates="teacher",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    schedule_items: Mapped[list["ScheduleItem"]] = relationship(
+        "ScheduleItem", back_populates="teacher", lazy="selectin"
+    )
+
+    substitutions_as_old: Mapped[list["TeacherSubstitution"]] = relationship(
+        "TeacherSubstitution",
+        foreign_keys="[TeacherSubstitution.old_teacher_id]",
+        back_populates="old_teacher",
+        lazy="selectin",
+    )
+
+    substitutions_as_new: Mapped[list["TeacherSubstitution"]] = relationship(
+        "TeacherSubstitution",
+        foreign_keys="[TeacherSubstitution.new_teacher_id]",
+        back_populates="new_teacher",
+        lazy="selectin",
+    )
+
+    @property
+    def subjects(self) -> list["Subject"]:
+        # return the list of subjects taught by the teacher
+        return [ts.subject for ts in self.teacher_subjects]
+
     __table_args__ = (
         CheckConstraint(
             "NOT (is_full_time = TRUE AND is_invited = TRUE)",
             name="check_teacher_status",
         ),
     )
-    # TODO: rel
 
 
 class TeacherAvailability(Base, UUIDPKMixin):
@@ -51,6 +94,13 @@ class TeacherAvailability(Base, UUIDPKMixin):
     start_time: Mapped[time] = mapped_column(Time, nullable=False)
     end_time: Mapped[time] = mapped_column(Time, nullable=False)
 
+    # rel
+    teacher: Mapped["Teacher"] = relationship(
+        "Teacher",
+        back_populates="availabilities",
+        laxy="selectin",
+    )
+
     __table_args__ = (
         CheckConstraint(
             "end_time > start_time", name="check_time_order_in_availability"
@@ -59,13 +109,13 @@ class TeacherAvailability(Base, UUIDPKMixin):
             "teacher_id", "day_of_week", "start_time", name="uq_teacher_day_time"
         ),
     )
-    # TODO: rel
 
 
 class TeacherSubstitution(Base, UUIDPKMixin, TimestampMixin):
     schedule_item_id: Mapped[UUID] = mapped_column(
         ForeignKey("schedule_items.id", ondelete="RESTRICT"),
-        nullable=False, unique=True,
+        nullable=False,
+        unique=True,
     )
     old_teacher_id: Mapped[UUID] = mapped_column(
         ForeignKey("teachers.id", ondelete="RESTRICT"),
@@ -78,6 +128,25 @@ class TeacherSubstitution(Base, UUIDPKMixin, TimestampMixin):
 
     reason: Mapped[str] = mapped_column(String(100), nullable=True)
 
+    # rel
+    schedule_item: Mapped["ScheduleItem"] = relationship(
+        "ScheduleItem", back_populates="substitution", lazy="selectin"
+    )
+
+    old_teacher: Mapped["Teacher"] = relationship(
+        "Teacher",
+        foreign_keys=[old_teacher_id],
+        back_populates="substitutions_as_old",
+        lazy="selectin",
+    )
+
+    new_teacher: Mapped["Teacher"] = relationship(
+        "Teacher",
+        foreign_keys=[new_teacher_id],
+        back_populates="substitutions_as_new",
+        lazy="selectin",
+    )
+
     __table_args__ = (
         CheckConstraint(
             "old_teacher_id != new_teacher_id",
@@ -88,4 +157,3 @@ class TeacherSubstitution(Base, UUIDPKMixin, TimestampMixin):
             name="ck_teacher_substitution_reason_not_empty",
         ),
     )
-    # TODO: rel

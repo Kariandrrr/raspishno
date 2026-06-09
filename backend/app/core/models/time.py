@@ -1,29 +1,38 @@
 from datetime import time, date
+from typing import TYPE_CHECKING
 
-from sqlalchemy import (
-    Integer, Time, CheckConstraint, Date, UniqueConstraint
-)
+from sqlalchemy import Integer, Time, CheckConstraint, Date, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
 from .mixins import UUIDPKMixin
 from ...enums import SlotNumber
 
+if TYPE_CHECKING:
+    from . import ScheduleItem
+    from . import SchedulePlan
+    from . import Practice
+
 
 class TimeSlot(Base, UUIDPKMixin):
     slot_number: Mapped[SlotNumber] = mapped_column(
-        ENUM(SlotNumber, name="slot_number", create_type=True) ,default=SlotNumber.one, nullable=False
+        ENUM(SlotNumber, name="slot_number", create_type=True),
+        default=SlotNumber.one,
+        nullable=False,
     )
     start_time: Mapped[time] = mapped_column(Time, nullable=False)
     end_time: Mapped[time] = mapped_column(Time, nullable=False)
 
-    __table_args__ = (
-        CheckConstraint('end_time > start_time', name='check_time_order'),
-        UniqueConstraint('slot_number', name='slot_number_unique'),
+    # rel
+    schedule_items: Mapped[list["ScheduleItem"]] = relationship(
+        "ScheduleItem", back_populates="time_slot", lazy="selectin"
     )
 
-    #TODO: relations
+    __table_args__ = (
+        CheckConstraint("end_time > start_time", name="check_time_order"),
+        UniqueConstraint("slot_number", name="slot_number_unique"),
+    )
 
 
 class Semester(Base, UUIDPKMixin):
@@ -39,25 +48,34 @@ class Semester(Base, UUIDPKMixin):
     practice_start_date: Mapped[date] = mapped_column(Date, nullable=False)
     practice_end_date: Mapped[date] = mapped_column(Date, nullable=False)
 
+    # rel
+    schedule_plans: Mapped[list["SchedulePlan"]] = relationship(
+        "SchedulePlan", back_populates="semester", lazy="selectin"
+    )
+
+    schedule_items: Mapped[list["ScheduleItem"]] = relationship(
+        "ScheduleItem", back_populates="semester", lazy="selectin"
+    )
+
+    practices: Mapped[list["Practice"]] = relationship(
+        "Practice", back_populates="semester", lazy="selectin"
+    )
 
     __table_args__ = (
         CheckConstraint(
-            'academic_year BETWEEN 1 AND 7',
-            name='check_academic_year_range'
-            ),
-        CheckConstraint(
-            'semester_number BETWEEN 1 AND 14',
-            name='check_semester_number_range'
+            "academic_year BETWEEN 1 AND 7", name="check_academic_year_range"
         ),
         CheckConstraint(
-            'end_date > start_date', name='check_semester_dates'
+            "semester_number BETWEEN 1 AND 14", name="check_semester_number_range"
+        ),
+        CheckConstraint("end_date > start_date", name="check_semester_dates"),
+        CheckConstraint(
+            "session_end_date > session_start_date", name="check_session_dates"
         ),
         CheckConstraint(
-            'session_end_date > session_start_date', name='check_session_dates'
+            "practice_end_date > practice_start_date", name="check_practice_dates"
         ),
-        CheckConstraint(
-            'practice_end_date > practice_start_date', name='check_practice_dates'
+        UniqueConstraint(
+            "academic_year", "semester_number", name="unique_semester_year_number"
         ),
-        UniqueConstraint('academic_year', 'semester_number', name='unique_semester_year_number'),
     )
-    # TODO: relations

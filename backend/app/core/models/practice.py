@@ -1,4 +1,5 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Integer,
@@ -8,11 +9,14 @@ from sqlalchemy import (
     CheckConstraint,
 )
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
 from .mixins import UUIDPKMixin
 from ...enums import PracticeType
+
+if TYPE_CHECKING:
+    from . import Semester
 
 
 class Practice(Base, UUIDPKMixin):
@@ -31,11 +35,14 @@ class Practice(Base, UUIDPKMixin):
 
     hours: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    # rel
+    semester: Mapped["Semester"] = relationship(
+        "Semester", back_populates="practices", lazy="selectin"
+    )
+
     __table_args__ = (
         CheckConstraint(
             "practice_start_date < practice_end_date", name="ck_practice_date_order"
         ),
         CheckConstraint("hours > 0 AND hours <= 1000", name="ck_practice_hours_range"),
     )
-
-    # TODO: rel
