@@ -41,6 +41,12 @@ __all__ = (
     "TeacherAvailabilityUpdate",
     "TeacherAvailabilityCreate",
     "TeacherAvailabilityBrief",
+    "TimeSlotResponse",
+    "TimeSlotListResponse",
+    "TimeSlotBase",
+    "TimeSlotUpdate",
+    "TimeSlotCreate",
+    "TimeSlotBrief",
 )
 
 from .user import UserRead, UserCreate, UserUpdate
@@ -94,4 +100,12 @@ from .teacher_and_subject.teacher_availability import (
     TeacherAvailabilityUpdate,
     TeacherAvailabilityCreate,
     TeacherAvailabilityBrief,
+)
+from .semester_and_slot_time.time_slot import (
+    TimeSlotResponse,
+    TimeSlotListResponse,
+    TimeSlotBase,
+    TimeSlotUpdate,
+    TimeSlotCreate,
+    TimeSlotBrief,
 )
