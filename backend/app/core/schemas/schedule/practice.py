@@ -79,5 +79,13 @@ class PracticeDetailResponse(PracticeResponse):
     )
 
 
+class PracticeBrief(BaseSchema):
+    id: UUID = Field(..., description="Уникальный идентификатор практики")
+    type: PracticeType = Field(..., description="Тип практики")
+    practice_start_date: date = Field(..., description="Дата начала практики")
+    practice_end_date: date = Field(..., description="Дата окончания практики")
+    hours: int = Field(..., description="Количество часов")
+
+
 class PracticeListResponse(ListResponse):
     items: list[PracticeResponse]

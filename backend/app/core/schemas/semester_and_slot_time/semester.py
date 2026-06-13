@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel, model_validator
 
 from .. import BaseSchema
 from ..ListResponse import ListResponse
+from ..schedule.practice import PracticeBrief
 
 
 class SemesterBase(BaseSchema):
@@ -148,7 +149,6 @@ class SemesterResponse(BaseSchema, SemesterBase):
 
 
 class SemesterDetailResponse(SemesterResponse):
-    # TODO: practice brief
     practices: list[PracticeBrief] = Field(
         default_factory=list,
         description="Список практик в семестре",
