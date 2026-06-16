@@ -9,7 +9,7 @@ from app.core.authentication import (
     get_refresh_token_service,
     UserManager,
 )
-from app.core.authentication.strategy import WorkTrackJWTStrategy, get_jwt_strategy
+from app.core.authentication.strategy import AppJWTStrategy, get_jwt_strategy
 from app.core.config import settings
 
 
@@ -22,7 +22,7 @@ async def _get_user_and_rotate(
     old_access_token: str,
     old_refresh_token: str,
     refresh_service: RefreshTokenService,
-    strategy: WorkTrackJWTStrategy,
+    strategy: AppJWTStrategy,
     user_manager: UserManager,
 ) -> tuple[str, str]:
     payload = await refresh_service.read_token(old_refresh_token)
@@ -57,7 +57,7 @@ def make_cookie_refresh_router() -> APIRouter:
         refresh_service: Annotated[
             RefreshTokenService, Depends(get_refresh_token_service)
         ],
-        strategy: Annotated[WorkTrackJWTStrategy, Depends(get_jwt_strategy)],
+        strategy: Annotated[AppJWTStrategy, Depends(get_jwt_strategy)],
         user_manager: Annotated[UserManager, Depends(get_user_manager)],
     ):
         old_access_token = request.cookies.get(settings.auth.cookie.access_name)
@@ -104,7 +104,7 @@ def make_bearer_refresh_router() -> APIRouter:
         refresh_service: Annotated[
             RefreshTokenService, Depends(get_refresh_token_service)
         ],
-        strategy: Annotated[WorkTrackJWTStrategy, Depends(get_jwt_strategy)],
+        strategy: Annotated[AppJWTStrategy, Depends(get_jwt_strategy)],
         user_manager: Annotated[UserManager, Depends(get_user_manager)],
     ):
         new_access, new_refresh = await _get_user_and_rotate(

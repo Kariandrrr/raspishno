@@ -10,7 +10,7 @@ from .cors_config import CORSConfig
 
 class Settings(BaseSettings):
     model_config: SettingsConfigDict = SettingsConfigDict(
-        env_file=("env.template", ".env"),
+        env_file=("env.template", ".env", ".env.test"),
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",

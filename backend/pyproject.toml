@@ -1,7 +1,7 @@
 [project]
-name = "work-track"
+name = "raspishno"
 version = "0.1.0"
-description = "Внутренний корпоративный портал для управления задачами и проектами"
+description = "Платформа для составления расписания"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

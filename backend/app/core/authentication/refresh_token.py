@@ -85,7 +85,7 @@ class RefreshTokenService:
             if jti and exp:
                 ttl = int(exp) - int(time.time())
                 if ttl > 0:
-                    await self.redis.setex(f"blacklist:refresh:{jti}", ttl, "1")
+                    await self.redis.set(f"blacklist:refresh:{jti}", "1", ex=ttl)
         except jwt.PyJWTError as e:
             log.warning("destroy_token: не удалось декодировать токен: %s", e)
 

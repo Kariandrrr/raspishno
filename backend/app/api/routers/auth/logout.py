@@ -10,7 +10,7 @@ from app.core.authentication import (
     get_refresh_token_service,
     UserManager,
 )
-from app.core.authentication.strategy import WorkTrackJWTStrategy, get_jwt_strategy
+from app.core.authentication.strategy import AppJWTStrategy, get_jwt_strategy
 from app.core.config import settings
 from app.core.models import User
 
@@ -28,7 +28,7 @@ def make_cookie_logout_router() -> APIRouter:
     async def cookie_logout(
         request: Request,
         response: Response,
-        strategy: Annotated[WorkTrackJWTStrategy, Depends(get_jwt_strategy)],
+        strategy: Annotated[AppJWTStrategy, Depends(get_jwt_strategy)],
         refresh_service: Annotated[
             RefreshTokenService, Depends(get_refresh_token_service)
         ],
@@ -63,7 +63,7 @@ def make_bearer_logout_router() -> APIRouter:
             tuple[User, str],
             Depends(fastapi_users.authenticator.current_user_token(active=True)),
         ],
-        strategy: Annotated[WorkTrackJWTStrategy, Depends(get_jwt_strategy)],
+        strategy: Annotated[AppJWTStrategy, Depends(get_jwt_strategy)],
         refresh_service: Annotated[
             RefreshTokenService, Depends(get_refresh_token_service)
         ],
