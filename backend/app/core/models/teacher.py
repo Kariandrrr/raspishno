@@ -16,7 +16,13 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
-from .mixins import UUIDPKMixin, TimestampMixin
+from .mixins import (
+    UUIDPKMixin,
+    CreatedByMixin,
+    TimestampMixin,
+    UpdateAtMixin,
+    UpdatedByMixin,
+)
 from ...enums import DayOfWeek
 
 if TYPE_CHECKING:
@@ -25,7 +31,9 @@ if TYPE_CHECKING:
     from . import Subject
 
 
-class Teacher(Base, UUIDPKMixin):
+class Teacher(
+    Base, UUIDPKMixin, TimestampMixin, CreatedByMixin, UpdateAtMixin, UpdatedByMixin
+):
     name: Mapped[str] = mapped_column(String(20), nullable=False)
     middle_name: Mapped[str | None] = mapped_column(String(30), nullable=True)
     last_name: Mapped[str] = mapped_column(String(30), nullable=False)
@@ -84,7 +92,9 @@ class Teacher(Base, UUIDPKMixin):
     )
 
 
-class TeacherAvailability(Base, UUIDPKMixin):
+class TeacherAvailability(
+    Base, UUIDPKMixin, TimestampMixin, CreatedByMixin, UpdateAtMixin, UpdatedByMixin
+):
     __tablename__ = "teacher_availability"
 
     teacher_id: Mapped[UUID] = mapped_column(ForeignKey("teachers.id"), nullable=False)
@@ -118,7 +128,9 @@ class TeacherAvailability(Base, UUIDPKMixin):
     )
 
 
-class TeacherSubstitution(Base, UUIDPKMixin, TimestampMixin):
+class TeacherSubstitution(
+    Base, UUIDPKMixin, TimestampMixin, CreatedByMixin, UpdateAtMixin, UpdatedByMixin
+):
     schedule_item_id: Mapped[UUID] = mapped_column(
         ForeignKey("schedule_items.id", ondelete="RESTRICT"),
         nullable=False,
