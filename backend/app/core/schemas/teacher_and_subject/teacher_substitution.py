@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel
 
 from .teacher import TeacherBrief
 from .. import BaseSchema, ScheduleItemBrief
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 
 
@@ -27,7 +28,7 @@ class TeacherSubstitutionUpdate(BaseModel):
     reason: str | None = Field(None, max_length=100, description="Причина замены")
 
 
-class TeacherSubstitutionResponse(BaseSchema, TeacherSubstitutionBase):
+class TeacherSubstitutionResponse(BaseSchema, TeacherSubstitutionBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     schedule_item_id: UUID = Field(..., description="ID пары/урока")
     old_teacher_id: UUID = Field(..., description="ID замененного преподавателя")

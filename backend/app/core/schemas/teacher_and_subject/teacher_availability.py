@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import Field, BaseModel, model_validator, field_validator
 
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 from ....enums import DayOfWeek
 
@@ -79,7 +80,7 @@ class TeacherAvailabilityUpdate(BaseModel):
         return v
 
 
-class TeacherAvailabilityResponse(BaseSchema, TeacherAvailabilityBase):
+class TeacherAvailabilityResponse(BaseSchema, TeacherAvailabilityBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     teacher_id: UUID = Field(..., description="Уникальный идентификатор преподавателя")
 

@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel, EmailStr, field_validator
 
 from .subject import SubjectBrief
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 
 
@@ -115,7 +116,7 @@ class TeacherUpdateByTeacher(BaseModel):
     email: EmailStr | None = Field(None, description="Email")
 
 
-class TeacherResponse(BaseSchema, TeacherBase):
+class TeacherResponse(BaseSchema, TeacherBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
 
 

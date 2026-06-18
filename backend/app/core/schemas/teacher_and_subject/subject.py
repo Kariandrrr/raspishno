@@ -4,6 +4,7 @@ from pydantic import Field, BaseModel
 
 from .teacher import TeacherBrief
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 
 
@@ -25,7 +26,7 @@ class SubjectUpdate(BaseModel):
     )
 
 
-class SubjectResponse(BaseSchema, SubjectBase):
+class SubjectResponse(BaseSchema, SubjectBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
 
 
