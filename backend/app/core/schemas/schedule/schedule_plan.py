@@ -3,6 +3,7 @@ from uuid import UUID
 from pydantic import Field, BaseModel, model_validator
 
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 
 
@@ -48,7 +49,7 @@ class SchedulePlanUpdate(BaseModel):
         return self
 
 
-class SchedulePlanResponse(BaseSchema, SchedulePlanBase):
+class SchedulePlanResponse(BaseSchema, SchedulePlanBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     speciality_id: UUID = Field(..., description="ID специальности")
     subject_id: UUID = Field(..., description="ID предмета")

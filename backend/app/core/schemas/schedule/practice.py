@@ -6,6 +6,7 @@ from pydantic import Field, BaseModel, model_validator
 from .. import BaseSchema, GroupBrief
 from ..ListResponse import ListResponse
 from ....enums import PracticeType
+from ..AuditResponse import AuditResponse
 
 
 class PracticeBase(BaseSchema):
@@ -67,7 +68,7 @@ class PracticeUpdate(BaseModel):
         return self
 
 
-class PracticeResponse(BaseSchema, PracticeBase):
+class PracticeResponse(BaseSchema, PracticeBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     semester_id: UUID = Field(..., description="ID семестра")
 

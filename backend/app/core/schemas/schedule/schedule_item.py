@@ -4,8 +4,8 @@ from uuid import UUID
 from pydantic import Field, BaseModel, model_validator
 
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
-
 from ....enums import ActivityType
 
 
@@ -63,7 +63,7 @@ class ScheduleItemBrief(BaseSchema):
     teacher_id: UUID = Field(..., description="ID преподавателя")
 
 
-class ScheduleItemResponse(BaseSchema, ScheduleItemBase):
+class ScheduleItemResponse(BaseSchema, ScheduleItemBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     created_at: datetime
     group_id: UUID = Field(..., description="ID группы")
