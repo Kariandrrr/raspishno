@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import Field, BaseModel, model_validator, field_validator
 
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 from ....enums import SlotNumber
 
@@ -73,7 +74,7 @@ class TimeSlotUpdate(BaseModel):
         return v
 
 
-class TimeSlotResponse(BaseSchema, TimeSlotBase):
+class TimeSlotResponse(BaseSchema, TimeSlotBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
 
 

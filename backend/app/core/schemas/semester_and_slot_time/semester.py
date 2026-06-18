@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import Field, BaseModel, model_validator
 
 from .. import BaseSchema
+from ..AuditResponse import AuditResponse
 from ..ListResponse import ListResponse
 from ..schedule.practice import PracticeBrief
 
@@ -144,7 +145,7 @@ class SemesterUpdate(BaseModel):
         return self
 
 
-class SemesterResponse(BaseSchema, SemesterBase):
+class SemesterResponse(BaseSchema, SemesterBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
 
 
