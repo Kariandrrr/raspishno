@@ -1,9 +1,11 @@
 from uuid import UUID
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, computed_field
 
-from . import BaseSchema
+from . import BaseSchema, SpecialityResponse
+from .AuditResponse import AuditResponse
 from .ListResponse import ListResponse
+from .teacher_and_subject.teacher import TeacherBrief
 from ...enums import Shift
 
 
@@ -44,22 +46,20 @@ class GroupUpdate(BaseModel):
     current_semester_id: UUID | None = Field(None, description="ID текущего семестра")
 
 
-class GroupResponse(BaseSchema, GroupBase):
+class GroupResponse(BaseSchema, GroupBase, AuditResponse):
     id: UUID = Field(..., description="Уникальный идентификатор")
     speciality_id: UUID = Field(..., description="ID специальности")
     current_semester_id: UUID = Field(..., description="ID текущего семестра")
 
 
-# TODO: create a GroupDetailResponse scheme  (add semesters above)
+class GroupDetailResponse(GroupResponse):
+    speciality: SpecialityResponse
+    teachers: list[TeacherBrief] = Field(default_factory=list)
 
-# class GroupDetailResponse(GroupResponse):
-#     speciality: SpecialityResponse
-#     teachers: list[TeacherBrief] = Field(default_factory=list)
-#
-#     @computed_field
-#     @property
-#     def full_name(self) -> str:
-#         return f"{self.name} ({self.speciality.code if hasattr(self, 'speciality') else self.speciality_id})"
+    @computed_field
+    @property
+    def full_name(self) -> str:
+        return f"{self.name} ({self.speciality.code if hasattr(self, 'speciality') else self.speciality_id})"
 
 
 class GroupBrief(BaseSchema):
