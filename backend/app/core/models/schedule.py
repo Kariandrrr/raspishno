@@ -13,7 +13,13 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .helpers import Base
-from .mixins import UUIDPKMixin, TimestampMixin
+from .mixins import (
+    UUIDPKMixin,
+    CreatedByMixin,
+    TimestampMixin,
+    UpdateAtMixin,
+    UpdatedByMixin,
+)
 from ...enums import ActivityType
 
 if TYPE_CHECKING:
@@ -27,7 +33,9 @@ if TYPE_CHECKING:
     from . import TeacherSubstitution
 
 
-class SchedulePlan(Base, UUIDPKMixin):
+class SchedulePlan(
+    Base, UUIDPKMixin, TimestampMixin, CreatedByMixin, UpdateAtMixin, UpdatedByMixin
+):
     speciality_id: Mapped[UUID] = mapped_column(
         ForeignKey(
             "specialities.id",
@@ -96,7 +104,9 @@ class SchedulePlan(Base, UUIDPKMixin):
     )
 
 
-class ScheduleItem(Base, UUIDPKMixin, TimestampMixin):
+class ScheduleItem(
+    Base, UUIDPKMixin, TimestampMixin, CreatedByMixin, UpdateAtMixin, UpdatedByMixin
+):
     group_id: Mapped[UUID] = mapped_column(
         ForeignKey("groups.id", ondelete="RESTRICT"),
         nullable=False,
